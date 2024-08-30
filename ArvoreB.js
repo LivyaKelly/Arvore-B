@@ -361,6 +361,32 @@ class SGBDSimples {
         console.log(`Memória utilizada para remoção: ${(memoriaDepois - memoriaAntes) / 1024} KB`);
     }
 
+    // Gera um número aleatório e insere na árvore B
+    inserirAleatorio() {
+        const chave = Math.floor(Math.random() * 10000); // Gera um número aleatório entre 0 e 999999
+        const valor = `Valor ${chave}`; // Associa um valor com base na chave aleatória
+        this.insert(chave, valor); // Chama o método existente de inserção
+    }
+
+    // Gera um número aleatório e busca na árvore B
+    buscarAleatorio() {
+        const chave = Math.floor(Math.random() * 10000); // Gera um número aleatório entre 0 e 999999
+        this.select(chave); // Chama o método existente de busca
+    }
+
+    // Gera um número aleatório e atualiza na árvore B
+    atualizarAleatorio() {
+        const chave = Math.floor(Math.random() * 10000); // Gera um número aleatório entre 0 e 999999
+        const novoValor = `NovoValor ${chave}`; // Gera um novo valor para a atualização
+        this.update(chave, novoValor); // Chama o método existente de atualização
+    }
+
+    // Gera um número aleatório e remove da árvore B
+    removerAleatorio() {
+        const chave = Math.floor(Math.random() * 10000); // Gera um número aleatório entre 0 e 999999
+        this.delete(chave); // Chama o método existente de remoção
+    }
+
     imprimirTabela() {
         console.log("\nTabela do SGBD:");
         console.log("Chave\tValor");
@@ -374,7 +400,7 @@ class SGBDSimples {
     gerarDadosAleatorios(quantidade) {
         console.log(`\nGerando ${quantidade} registros aleatórios...\n`);
         for (let i = 0; i < quantidade; i++) {
-            let chave = Math.floor(Math.random() * 1000); // Gera uma chave aleatória.
+            let chave = Math.floor(Math.random() * 10000); // Gera uma chave aleatória.
             let valor = `Valor ${chave}`; // Gera um valor correspondente à chave.
             this.arvoreB.inserir(chave); // Insere a chave diretamente na Árvore B.
             this.bancoDeDados[chave] = valor; // Adiciona o registro ao banco de dados sem mensagens no console.
@@ -416,7 +442,7 @@ class SGBDSimples {
 const prompt = require('prompt-sync')(); // Biblioteca para obter input do usuário
 
 function menu() {
-    let sgbd = new SGBDSimples(5); // Inicializa o SGBD com uma Árvore B de ordem 5
+    let sgbd = new SGBDSimples(10); // Inicializa o SGBD com uma Árvore B de ordem 3
 
     while (true) {
         console.log("\nMenu de Operações:");
@@ -427,6 +453,10 @@ function menu() {
         console.log("5 - Inserir dados aleatórios na Árvore");
         console.log("6 - Mostrar a Árvore");
         console.log("7 - Excluir a Árvore");
+        console.log("8 - Inserir número aleatório na Árvore");
+        console.log("9 - Buscar número aleatório na Árvore");
+        console.log("10 - Atualizar número aleatório na Árvore");
+        console.log("11 - Remover número aleatório da Árvore");
         console.log("0 - Sair do Menu");
 
         const opcao = prompt("Escolha uma operação: "); // Lê a opção escolhida pelo usuário
@@ -459,13 +489,24 @@ function menu() {
                     console.log("Estado atual da Árvore B:");
                     sgbd.arvoreB.imprimirArvoreAninhada(); // Chama a função para imprimir a árvore de forma aninhada
                 } else {
-                    let sgbd = new SGBDSimples(5); // Inicializa o SGBD com uma Árvore B de ordem 5
-                    sgbd.arvoreB.imprimirArvoreAninhada(); // Chama a função para imprimir a árvore de forma aninhada
+                    let sgbd = new SGBDSimples(10); // Inicializa o SGBD com uma Árvore B de ordem 5
+                    sgbd.arvoreB.imprimirArvoreAninhada(); // Chama a função para imprimir a árvore de forma aninhada                
                 }
                 break;
             case '7':
-                console.log("Árvore excluída.");
-                sgbd.excluirArvore();
+                sgbd.excluirArvore(); // Chama o método para excluir a árvore e o banco de dados
+                break;
+            case '8':
+                sgbd.inserirAleatorio(); // Chama o método para inserir um número aleatório na árvore
+                break;
+            case '9':
+                sgbd.buscarAleatorio(); // Chama o método para buscar um número aleatório na árvore
+                break;
+            case '10':
+                sgbd.atualizarAleatorio(); // Chama o método para atualizar um número aleatório na árvore
+                break;
+            case '11':
+                sgbd.removerAleatorio(); // Chama o método para remover um número aleatório da árvore
                 break;
             case '0':
                 console.log("Saindo do menu.");
