@@ -143,7 +143,6 @@ class ArvoreB {
         }
     }
 
-    // Método para buscar uma chave na árvore B
     buscar(no, chave) {
         let i = 0;
         // Percorre as chaves do nó até encontrar uma chave maior ou igual à chave que está sendo buscada.
@@ -178,101 +177,12 @@ class ArvoreB {
         return null; // Retorna null se o arquivo não existir
     }
 
-    removerDeNaoFolha(no, idx) {
-        let chave = no.chaves[idx];
-
-        if (no.filhos[idx].chaves.length >= Math.ceil(this.ordem / 2)) {
-            let predecessor = this.getPredecessor(no, idx);
-            no.chaves[idx] = predecessor;
-            this.removerChave(no.filhos[idx], predecessor);
-        } else if (no.filhos[idx + 1].chaves.length >= Math.ceil(this.ordem / 2)) {
-            let sucessor = this.getSucessor(no, idx);
-            no.chaves[idx] = sucessor;
-            this.removerChave(no.filhos[idx + 1], sucessor);
-        } else {
-            this.fundir(no, idx);
-            this.removerChave(no.filhos[idx], chave);
-        }
-    }
-
-    getPredecessor(no, idx) {
-        let atual = no.filhos[idx];
-        while (!atual.ehFolha) {
-            atual = atual.filhos[atual.chaves.length];
-        }
-        return atual.chaves[atual.chaves.length - 1];
-    }
-
-    getSucessor(no, idx) {
-        let atual = no.filhos[idx + 1];
-        while (!atual.ehFolha) {
-            atual = atual.filhos[0];
-        }
-        return atual.chaves[0];
-    }
-
-    preencher(no, idx) {
-        if (idx !== 0 && no.filhos[idx - 1].chaves.length >= Math.ceil(this.ordem / 2)) {
-            this.pegarDoAnterior(no, idx);
-        } else if (idx !== no.chaves.length && no.filhos[idx + 1].chaves.length >= Math.ceil(this.ordem / 2)) {
-            this.pegarDoProximo(no, idx);
-        } else {
-            if (idx !== no.chaves.length) {
-                this.fundir(no, idx);
-            } else {
-                this.fundir(no, idx - 1);
-            }
-        }
-    }
-
-    pegarDoAnterior(no, idx) {
-        let filho = no.filhos[idx];
-        let irmao = no.filhos[idx - 1];
-
-        filho.chaves.unshift(no.chaves[idx - 1]);
-
-        if (!filho.ehFolha) {
-            filho.filhos.unshift(irmao.filhos.pop());
-        }
-
-        no.chaves[idx - 1] = irmao.chaves.pop();
-    }
-
-    pegarDoProximo(no, idx) {
-        let filho = no.filhos[idx];
-        let irmao = no.filhos[idx + 1];
-
-        filho.chaves.push(no.chaves[idx]);
-
-        if (!filho.ehFolha) {
-            filho.filhos.push(irmao.filhos.shift());
-        }
-
-        no.chaves[idx] = irmao.chaves.shift();
-    }
-
-    fundir(no, idx) {
-        let filho = no.filhos[idx];
-        let irmao = no.filhos[idx + 1];
-
-        filho.chaves.push(no.chaves[idx]);
-
-        for (let i = 0; i < irmao.chaves.length; i++) {
-            filho.chaves.push(irmao.chaves[i]);
-        }
-
-        if (!filho.ehFolha) {
-            for (let i = 0; i <= irmao.chaves.length; i++) {
-                filho.filhos.push(irmao.filhos[i]);
-            }
-        }
-
-        no.chaves.splice(idx, 1);
-        no.filhos.splice(idx + 1, 1);
-    }
-
     // Nova função para imprimir a árvore de forma aninhada
     imprimirArvoreAninhada(no = this.raiz, nivel = 0, prefixo = "") {
+        if (!no) {
+            console.log("Árvore vazia.");
+            return;
+        }
         console.log(prefixo + (nivel > 0 ? "├── " : "") + `Nível ${nivel}: [${no.chaves.join(", ")}]`);
         if (!no.ehFolha) {
             for (let i = 0; i < no.filhos.length; i++) {
@@ -283,6 +193,7 @@ class ArvoreB {
         }
     }
 }
+
 // Definição da classe SGBDSimples para gerenciar o banco de dados com a árvore B
 class SGBDSimples {
     constructor(ordem) {
@@ -361,32 +272,6 @@ class SGBDSimples {
         console.log(`Memória utilizada para remoção: ${(memoriaDepois - memoriaAntes) / 1024} KB`);
     }
 
-    // Gera um número aleatório e insere na árvore B
-    inserirAleatorio() {
-        const chave = Math.floor(Math.random() * 10000); // Gera um número aleatório entre 0 e 999999
-        const valor = `Valor ${chave}`; // Associa um valor com base na chave aleatória
-        this.insert(chave, valor); // Chama o método existente de inserção
-    }
-
-    // Gera um número aleatório e busca na árvore B
-    buscarAleatorio() {
-        const chave = Math.floor(Math.random() * 10000); // Gera um número aleatório entre 0 e 999999
-        this.select(chave); // Chama o método existente de busca
-    }
-
-    // Gera um número aleatório e atualiza na árvore B
-    atualizarAleatorio() {
-        const chave = Math.floor(Math.random() * 10000); // Gera um número aleatório entre 0 e 999999
-        const novoValor = `NovoValor ${chave}`; // Gera um novo valor para a atualização
-        this.update(chave, novoValor); // Chama o método existente de atualização
-    }
-
-    // Gera um número aleatório e remove da árvore B
-    removerAleatorio() {
-        const chave = Math.floor(Math.random() * 10000); // Gera um número aleatório entre 0 e 999999
-        this.delete(chave); // Chama o método existente de remoção
-    }
-
     imprimirTabela() {
         console.log("\nTabela do SGBD:");
         console.log("Chave\tValor");
@@ -399,11 +284,17 @@ class SGBDSimples {
 
     gerarDadosAleatorios(quantidade) {
         console.log(`\nGerando ${quantidade} registros aleatórios...\n`);
+
+        // Reinicialize a árvore B se ela for nula
+        if (this.arvoreB === null) {
+            this.arvoreB = new ArvoreB(10); // Ou a ordem que você deseja usar
+        }
+
         for (let i = 0; i < quantidade; i++) {
-            let chave = Math.floor(Math.random() * 10000); // Gera uma chave aleatória.
+            let chave = Math.floor(Math.random() * 1000000); // Gera uma chave aleatória entre 0 e 999999.
             let valor = `Valor ${chave}`; // Gera um valor correspondente à chave.
             this.arvoreB.inserir(chave); // Insere a chave diretamente na Árvore B.
-            this.bancoDeDados[chave] = valor; // Adiciona o registro ao banco de dados sem mensagens no console.
+            this.bancoDeDados[chave] = valor; // Adiciona o registro ao banco de dados.
         }
         this.salvarBancoDeDados(); // Salva o banco de dados após gerar registros aleatórios.
         console.log("Geração de dados aleatórios concluída.");
@@ -424,25 +315,87 @@ class SGBDSimples {
         console.log("Árvore e banco de dados excluídos com sucesso.");
     }
 
-    // Função para salvar o banco de dados em um arquivo JSON
     salvarBancoDeDados() {
         const json = JSON.stringify(this.bancoDeDados, null, 2);
         fs.writeFileSync('bancoDeDados.json', json, 'utf8');
     }
 
-    // Função para carregar o banco de dados de um arquivo JSON
     carregarBancoDeDados() {
         if (fs.existsSync('bancoDeDados.json')) {
             const jsonData = fs.readFileSync('bancoDeDados.json', 'utf8');
             this.bancoDeDados = JSON.parse(jsonData);
         }
     }
+
+    inserirAleatorio() {
+        const chave = Math.floor(Math.random() * 1000000); // Gera um número aleatório entre 0 e 999999
+        const valor = `Valor ${chave}`; // Associa um valor com base na chave aleatória
+        this.insert(chave, valor); // Chama o método existente de inserção
+    }
+
+    buscarAleatorio() {
+        const chave = Math.floor(Math.random() * 1000000); // Gera um número aleatório entre 0 e 999999
+        this.select(chave); // Chama o método existente de busca
+    }
+
+    atualizarAleatorio() {
+        const chave = Math.floor(Math.random() * 1000000); // Gera um número aleatório entre 0 e 999999
+        const novoValor = `NovoValor ${chave}`; // Gera um novo valor para a atualização
+        this.update(chave, novoValor); // Chama o método existente de atualização
+    }
+
+    removerAleatorio() {
+        const chave = Math.floor(Math.random() * 1000000); // Gera um número aleatório entre 0 e 999999
+        this.delete(chave); // Chama o método existente de remoção
+    }
+
+    // Função para coletar dados de desempenho para cada operação
+    coletarDadosOperacoes() {
+        const tamanhos = [500, 1000, 5000, 10000, 50000, 100000, 500000];
+        const resultados = [];
+
+        for (const tamanho of tamanhos) {
+            console.log(`\nPreenchendo árvore com ${tamanho} elementos aleatórios...`);
+            this.excluirArvore(); // Reinicia a árvore para o próximo teste
+            this.gerarDadosAleatorios(tamanho); // Preenche a árvore com a quantidade de elementos
+
+            const dadosOperacao = {
+                tamanho: tamanho,
+                insercao: this.testarOperacao('inserirAleatorio'),
+                busca: this.testarOperacao('buscarAleatorio'),
+                atualizacao: this.testarOperacao('atualizarAleatorio'),
+                remocao: this.testarOperacao('removerAleatorio')
+            };
+
+            resultados.push(dadosOperacao);
+        }
+
+        console.log("\nResultados da Coleta de Dados:");
+        console.table(resultados);
+    }
+
+    // Método para testar e coletar dados de uma operação específica
+    testarOperacao(operacao) {
+        console.time(`Tempo de ${operacao}`); // Inicia a medição de tempo
+        const memoriaAntes = process.memoryUsage().heapUsed; // Captura o uso de memória antes da operação
+
+        this[operacao](); // Executa a operação
+
+        const memoriaDepois = process.memoryUsage().heapUsed; // Captura o uso de memória após a operação
+        console.timeEnd(`Tempo de ${operacao}`); // Finaliza a medição de tempo
+
+        return {
+            tempo: console.timeLog(`Tempo de ${operacao}`), // Captura o tempo de execução
+            memoria: (memoriaDepois - memoriaAntes) / 1024 // Calcula o uso de memória em KB
+        };
+    }
 }
 
+// Função para exibir o menu e realizar operações na árvore B
 const prompt = require('prompt-sync')(); // Biblioteca para obter input do usuário
 
 function menu() {
-    let sgbd = new SGBDSimples(10); // Inicializa o SGBD com uma Árvore B de ordem 3
+    let sgbd = new SGBDSimples(10); // Inicializa o SGBD com uma Árvore B de ordem 10
 
     while (true) {
         console.log("\nMenu de Operações:");
@@ -457,6 +410,7 @@ function menu() {
         console.log("9 - Buscar número aleatório na Árvore");
         console.log("10 - Atualizar número aleatório na Árvore");
         console.log("11 - Remover número aleatório da Árvore");
+        console.log("12 - Coletar dados de operações");
         console.log("0 - Sair do Menu");
 
         const opcao = prompt("Escolha uma operação: "); // Lê a opção escolhida pelo usuário
@@ -489,8 +443,7 @@ function menu() {
                     console.log("Estado atual da Árvore B:");
                     sgbd.arvoreB.imprimirArvoreAninhada(); // Chama a função para imprimir a árvore de forma aninhada
                 } else {
-                    let sgbd = new SGBDSimples(10); // Inicializa o SGBD com uma Árvore B de ordem 5
-                    sgbd.arvoreB.imprimirArvoreAninhada(); // Chama a função para imprimir a árvore de forma aninhada                
+                    console.log("A árvore foi excluída. Nenhuma árvore para mostrar.");
                 }
                 break;
             case '7':
@@ -507,6 +460,9 @@ function menu() {
                 break;
             case '11':
                 sgbd.removerAleatorio(); // Chama o método para remover um número aleatório da árvore
+                break;
+            case '12':
+                sgbd.coletarDadosOperacoes(); // Coleta dados de desempenho para operações
                 break;
             case '0':
                 console.log("Saindo do menu.");
